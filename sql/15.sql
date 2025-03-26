@@ -9,23 +9,9 @@
  * and you can SELECT from that VIEW instead of constructing the entire query manually.
  */
 
-SELECT
-    f.title,
-    STRING_AGG(
-        INITCAP(a.first_name) || INITCAP(a.last_name), ', '
-        ORDER BY fa.actor_id
-    ) AS actors
-FROM
-    film f
-JOIN film_category fc ON f.film_id = fc.film_id
-JOIN category c ON fc.category_id = c.category_id
-JOIN film_actor fa ON f.film_id = fa.film_id
-JOIN actor a ON fa.actor_id = a.actor_id
-WHERE
-    c.name = 'Documentary'
-    AND f.rating = 'G'
-GROUP BY
-    f.title
-ORDER BY
-    f.title;
-
+SELECT title, STRING_AGG( initcap(first_name) || initcap(last_name), ', ') AS actors
+FROM actor JOIN film_actor USING (actor_id)
+JOIN film USING (film_id)
+JOIN film_category USING (film_id)
+JOIN category USING (category_id)
+WHERE name = 'Documentary' AND rating = 'G' GROUP BY 1;
