@@ -7,21 +7,17 @@
  */
 
 -- Get all film IDs with 3 or more actors from the 3 favorite films
-WITH target_actors AS (
-    SELECT DISTINCT fa.actor_id
-    FROM film f
-    JOIN film_actor fa ON f.film_id = fa.film_id
-    WHERE f.title IN ('ACADEMY DINOSAUR', 'AGENT TRUMAN', 'AMERICAN CIRCUS')
-),
-films_with_matches AS (
-    SELECT fa.film_id
-    FROM film_actor fa
-    JOIN target_actors ta ON fa.actor_id = ta.actor_id
-    GROUP BY fa.film_id
-    HAVING COUNT(DISTINCT fa.actor_id) >= 3
-)
-SELECT f.title
-FROM film f
-JOIN films_with_matches fm ON f.film_id = fm.film_id
-ORDER BY f.title;
+
+SELECT title
+FROM (
+    SELECT f1.title, COUNT(*) AS actor_count
+    FROM film f1
+    JOIN film_actor fa1 USING (film_id)
+    JOIN film_actor fa2 USING (actor_id)
+    JOIN film f2 ON fa2.film_id = f2.film_id
+    WHERE f2.title IN ('AMERICAN CIRCUS', 'ACADEMY DINOSAUR', 'AGENT TRUMAN')
+    GROUP BY f1.title
+) a
+WHERE actor_count >= 3
+ORDER BY title;
 
